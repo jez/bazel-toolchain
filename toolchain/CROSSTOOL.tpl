@@ -88,7 +88,8 @@ toolchain {
   linker_flag: "-lm"
   linker_flag: "-fuse-ld=lld"
   linker_flag: "-Wl,--build-id=md5"
-  linker_flag: "-Wl,--hash-style=gnu"
+  linker_flag: "-Wl,--hash-style=both"
+  linker_flag: "-Wl,-z,relro,-z,now"
 
   # Syntax for include directories is mentioned at:
   # https://github.com/bazelbuild/bazel/blob/d61a185de8582d29dda7525bb04d8ffc5be3bd11/src/main/java/com/google/devtools/build/lib/rules/cpp/CcToolchain.java#L125
