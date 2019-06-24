@@ -86,6 +86,12 @@ def llvm_toolchain_impl(rctx):
     if not _download_llvm(rctx):
         _download_llvm_preconfigured(rctx)
 
+    # Copy libc++.a and libc++abi.a to -static variants to ensure they're
+    # available for static linking on OSX.
+    rctx.execute(["cp", "lib/libc++.a", "lib/libc++-static.a"])
+    rctx.execute(["cp", "lib/libc++abi.a", "lib/libc++abi-static.a"])
+
+
 def conditional_cc_toolchain(name, cpu, darwin, absolute_paths = False):
     # Toolchain macro for BUILD file to use conditional logic.
 
