@@ -195,10 +195,38 @@ toolchain {
   # C++
   cxx_flag: "-std=c++17"
   cxx_flag: "-stdlib=libc++"
+
   # The linker has no way of knowing if there are C++ objects; so we always link C++ libraries.
-  linker_flag: "-L%{toolchain_path_prefix}lib"
-  linker_flag: "-lc++-static"
-  linker_flag: "-lc++abi-static"
+
+  # NOTE: all of the static configurations add the `lib` path to the linker's
+  # search path, but this is explicitly left off of the DYNAMIC case, as we're
+  # not distributing `libc++.1.dylib` and `libc++abi.1.dylib` currently.
+  linking_mode_flags {
+    mode: FULLY_STATIC
+    linker_flag: "-L%{toolchain_path_prefix}lib"
+    linker_flag: "-lc++-static"
+    linker_flag: "-lc++abi-static"
+  }
+
+  linking_mode_flags {
+    mode: MOSTLY_STATIC
+    linker_flag: "-L%{toolchain_path_prefix}lib"
+    linker_flag: "-lc++-static"
+    linker_flag: "-lc++abi-static"
+  }
+
+  linking_mode_flags {
+    mode: MOSTLY_STATIC_LIBRARIES
+    linker_flag: "-L%{toolchain_path_prefix}lib"
+    linker_flag: "-lc++-static"
+    linker_flag: "-lc++abi-static"
+  }
+
+  linking_mode_flags {
+    mode: DYNAMIC
+    linker_flag: "-lc++"
+    linker_flag: "-lc++abi"
+  }
 
   # Linker
   linker_flag: "-lm"
