@@ -18,7 +18,7 @@ import platform
 import sys
 
 def _darwin(llvm_version):
-    return "clang+llvm-{llvm_version}-x86_64-apple-darwin.tar.xz".format(
+    return "clang+llvm-{llvm_version}-x86_64-darwin-apple.tar.xz".format(
         llvm_version=llvm_version)
 
 def _windows(llvm_version):
