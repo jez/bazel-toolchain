@@ -607,11 +607,29 @@ def _impl(ctx):
                 ),
                 flag_set(
                     actions = [ACTION_NAMES.cpp_link_nodeps_dynamic_library],
-                    flag_groups = [flag_group(flags = ["-lc++", "-lc++abi"])],
+                    flag_groups = [
+                        flag_group(
+                            flags = [
+                                "-lc++",
+                                "-lc++abi",
+                                "-undefined",
+                                "dynamic_lookup"
+                            ]
+                        )
+                    ],
                 ),
                 flag_set(
                     actions = [ACTION_NAMES.cpp_link_dynamic_library],
-                    flag_groups = [flag_group(flags = ["-lc++", "-lc++abi"])],
+                    flag_groups = [
+                        flag_group(
+                            flags = [
+                                "-lc++",
+                                "-lc++abi",
+                                "-undefined",
+                                "dynamic_lookup"
+                            ]
+                        )
+                    ],
                     with_features = [
                         with_feature_set(
                             not_features = ["static_link_cpp_runtimes"],
@@ -620,7 +638,16 @@ def _impl(ctx):
                 ),
                 flag_set(
                     actions = [ACTION_NAMES.cpp_link_executable],
-                    flag_groups = [flag_group(flags = ["-lc++", "-lc++abi"])],
+                    flag_groups = [
+                        flag_group(
+                            flags = [
+                                "-lc++",
+                                "-lc++abi",
+                                "-undefined",
+                                "dynamic_lookup"
+                            ]
+                        )
+                    ],
                     with_features = [with_feature_set(features = ["dynamic_linking_mode"])],
                 ),
             ],
