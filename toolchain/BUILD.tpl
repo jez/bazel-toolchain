@@ -41,10 +41,22 @@ cc_toolchain_suite(
     },
 )
 
+load(":cc_toolchain_config.bzl", "cc_toolchain_config")
+
+cc_toolchain_config(
+    name = "local_linux",
+    cpu = "k8",
+)
+
+cc_toolchain_config(
+    name = "local_darwin",
+    cpu = "darwin",
+)
+
 load("@com_grail_bazel_toolchain//toolchain:rules.bzl", "conditional_cc_toolchain")
 
-conditional_cc_toolchain("cc-clang-linux", "k8", False, %{absolute_paths})
-conditional_cc_toolchain("cc-clang-darwin", "darwin", True, %{absolute_paths})
+conditional_cc_toolchain("cc-clang-linux", False, %{absolute_paths})
+conditional_cc_toolchain("cc-clang-darwin", True, %{absolute_paths})
 
 ## LLVM toolchain files
 # Needed when not using absolute paths.

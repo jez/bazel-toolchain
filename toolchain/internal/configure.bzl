@@ -51,8 +51,8 @@ def llvm_toolchain_impl(rctx):
     }
 
     rctx.template(
-        "CROSSTOOL",
-        Label("@com_grail_bazel_toolchain//toolchain:CROSSTOOL.tpl"),
+        "cc_toolchain_config.bzl",
+        Label("@com_grail_bazel_toolchain//toolchain:cc_toolchain_config.bzl.tpl"),
         substitutions,
     )
     rctx.template(
@@ -92,21 +92,20 @@ def llvm_toolchain_impl(rctx):
     rctx.execute(["cp", "lib/libc++abi.a", "lib/libc++abi-static.a"])
 
 
-def conditional_cc_toolchain(name, cpu, darwin, absolute_paths = False):
+def conditional_cc_toolchain(name, darwin, absolute_paths = False):
     # Toolchain macro for BUILD file to use conditional logic.
+
+    toolchain_config = "local_darwin" if darwin else "local_linux"
 
     if absolute_paths:
         native.cc_toolchain(
             name = name,
-            toolchain_identifier = "clang-darwin" if darwin else "clang-linux",
-            cpu = cpu,
+            toolchain_config = toolchain_config,
             all_files = ":empty",
             compiler_files = ":empty",
             dwp_files = ":empty",
-            dynamic_runtime_libs = [":empty"],
             linker_files = ":empty",
             objcopy_files = ":empty",
-            static_runtime_libs = [":empty"],
             strip_files = ":empty",
             supports_param_files = 0 if darwin else 1,
         )
@@ -117,15 +116,12 @@ def conditional_cc_toolchain(name, cpu, darwin, absolute_paths = False):
         native.filegroup(name = name + "-linker-files", srcs = [":linker_components"] + extra_files)
         native.cc_toolchain(
             name = name,
-            toolchain_identifier = "clang-darwin" if darwin else "clang-linux",
-            cpu = cpu,
+            toolchain_config = toolchain_config,
             all_files = name + "-all-files",
             compiler_files = name + "-compiler-files",
             dwp_files = ":empty",
-            dynamic_runtime_libs = [":empty"],
             linker_files = name + "-linker-files",
             objcopy_files = ":objcopy",
-            static_runtime_libs = [":empty"],
             strip_files = ":empty",
             supports_param_files = 0 if darwin else 1,
         )
