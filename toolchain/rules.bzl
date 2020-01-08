@@ -14,9 +14,11 @@
 
 load(
     "@com_grail_bazel_toolchain//toolchain/internal:configure.bzl",
-    "conditional_cc_toolchain",
+    _conditional_cc_toolchain = "conditional_cc_toolchain",
     _llvm_toolchain_impl = "llvm_toolchain_impl",
 )
+
+conditional_cc_toolchain = _conditional_cc_toolchain
 
 llvm_toolchain = repository_rule(
     attrs = {
