@@ -39,8 +39,8 @@ llvm_toolchain = repository_rule(
                    "path. Else, the value will be assumed to be a label containing the files and " +
                    "the sysroot path will be taken as the path to the package of this label."),
         ),
-        "llvm_mirror": attr.string(
-            doc = "Mirror base for LLVM binaries if using the pre-configured URLs.",
+        "llvm_mirror_prefixes": attr.string_list(
+            doc = "Mirror bases for LLVM binaries if using the pre-configured URLs.",
         ),
         "absolute_paths": attr.bool(
             default = False,

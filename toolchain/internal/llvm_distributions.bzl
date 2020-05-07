@@ -64,9 +64,9 @@ def download_llvm_preconfigured(rctx):
     llvm_version = rctx.attr.llvm_version
 
     url_base = []
-    if rctx.attr.llvm_mirror:
-        url_base += [rctx.attr.llvm_mirror]
-    url_base += ["https://releases.llvm.org"]
+    if rctx.attr.llvm_mirror_prefixes:
+        url_base += rctx.attr.llvm_mirror_prefixes
+    url_base += ["https://releases.llvm.org/"]
 
     if rctx.attr.distribution == "auto":
         exec_result = rctx.execute([
@@ -85,7 +85,7 @@ def download_llvm_preconfigured(rctx):
         fail("Unknown LLVM release: %s\nPlease ensure file name is correct." % basename)
 
     urls = [
-        (base + "/{0}/{1}".format(llvm_version, basename)).replace("+", "%2B")
+        "{0}{1}/{2}".format(base, llvm_version, basename)
         for base in url_base
     ]
 
