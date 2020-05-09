@@ -102,7 +102,7 @@ def download_llvm_preconfigured(rctx):
         fail("Unknown LLVM release: %s\nPlease ensure file name is correct." % basename)
 
     urls = [
-        "{0}{1}/{2}".format(base, llvm_version, basename)
+        "{0}{1}/{2}".format(base, llvm_version, basename.replace("+", "%2B"))
         for base in url_base
     ]
 
