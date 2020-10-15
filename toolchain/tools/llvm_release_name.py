@@ -17,9 +17,16 @@
 import platform
 import sys
 
+_known_distros = ["freebsd", "suse", "ubuntu", "arch", "manjaro", "debian", "fedora", "centos"]
+
+def _major_llvm_version(llvm_version):
+    return int(llvm_version.split(".")[0])
+
 def _darwin(llvm_version):
-    return "clang+llvm-{llvm_version}-x86_64-darwin-apple.tar.xz".format(
-        llvm_version=llvm_version)
+    major_llvm_version = _major_llvm_version(llvm_version)
+    suffix = "darwin-apple" if major_llvm_version == 9 else "apple-darwin"
+    return "clang+llvm-{llvm_version}-x86_64-{suffix}.tar.xz".format(
+        llvm_version=llvm_version, suffix=suffix)
 
 def _windows(llvm_version):
     if platform.machine().endswith('64'):
@@ -48,9 +55,17 @@ def _linux(llvm_version):
         sys.exit("Could not find ID in /etc/os-release.")
     distname = info["ID"].strip('\"')
 
+    if distname not in _known_distros:
+        for distro in info["ID_LIKE"].strip('\"').split(' '):
+            if distro in _known_distros:
+                distname = distro
+                break
+
     version = None
     if "VERSION_ID" in info:
         version = info["VERSION_ID"].strip('"')
+
+    major_llvm_version = _major_llvm_version(llvm_version)
 
     # NOTE: Many of these systems are untested because I do not have access to them.
     # If you find this mapping wrong, please send a Pull Request on Github.
@@ -62,15 +77,32 @@ def _linux(llvm_version):
         os_name = "linux-sles%s" % version
     elif distname == "ubuntu" and version.startswith("14.04"):
         os_name = "linux-gnu-ubuntu-14.04"
-    elif distname == "ubuntu" and version.startswith("18.04"):
+    elif (distname == "ubuntu" and version.startswith("20.04")) or (distname == "linuxmint" and version.startswith("20")):
+        # There is no binary packages specifically for 20.04, but those for 18.04 works on
+        # 20.04
         os_name = "linux-gnu-ubuntu-18.04"
-    elif distname in ["arch", "ubuntu"] or (distname == "linuxmint" and version.startswith("18")):
+    elif (distname == "ubuntu" and version.startswith("18.04")) or (distname == "linuxmint" and version.startswith("19")):
+        os_name = "linux-gnu-ubuntu-18.04"
+    elif (distname == "ubuntu" and version.startswith("20")) or (distname == "pop" and version.startswith("20")):
+        # use ubuntu 18.04 clang LLVM release for ubuntu 20.04
+        os_name = "linux-gnu-ubuntu-18.04"
+    elif distname in ["arch", "ubuntu", "manjaro"] or (distname == "linuxmint" and version.startswith("18")):
         os_name = "linux-gnu-ubuntu-16.04"
-    elif distname == "debian" and int(version) >= 8:
+    elif distname == "debian" and (version is None or int(version) == 10):
+        os_name = "linux-gnu-ubuntu-18.04"
+    elif distname == "debian" and int(version) == 9 and major_llvm_version >= 7:
+        os_name = "linux-gnu-ubuntu-16.04"
+    elif distname == "debian" and int(version) == 8 and major_llvm_version < 7:
         os_name = "linux-gnu-debian8"
     elif ((distname == "fedora" and int(version) >= 27) or
-          (distname == "centos" and int(version) >= 7)):
+          (distname == "centos" and int(version) >= 7)) and major_llvm_version < 7:
         os_name = "linux-gnu-Fedora27"
+    elif distname == "centos" and major_llvm_version >= 7:
+        os_name = "linux-sles11.3"
+    elif distname == "fedora" and major_llvm_version >= 7:
+        os_name = "linux-gnu-ubuntu-18.04"
+    elif distname == "amzn" and major_llvm_version >= 7:
+        os_name = "linux-gnu-ubuntu-18.04"
     else:
         sys.exit("Unsupported linux distribution and version: %s, %s" % (distname, version))
 
